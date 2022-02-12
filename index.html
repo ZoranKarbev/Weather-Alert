@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Alert</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <nav id='navbar'>
+        <div class="app-title">Weather Alert</div>
+        <a href="#" class="toggle-btn">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </a>
+        <div class="navbar-links">
+            <ul>
+                <li><a href="#" id="statistics">Statistics</a></li>
+                <li><a href="#" id="hourly-forecast">Hourly Forecast</a></li>
+                <li><input type="text" id="input" placeholder="city"></li>
+                <li><input type="button" value="Search" id="search"></li>
+
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div id="result-div"></div>
+        <div id="table-div"></div>
+        <div id="error-div"></div>
+    </main>
+
+    <footer>
+        <h5>©2022 Zoran Karbev</h5>
+    </footer>
+
+    <script src="navbar.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
