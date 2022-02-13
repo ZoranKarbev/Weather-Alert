@@ -1,15 +1,18 @@
+const API_KEY = "46947e8e71204bbdb2eb18c3cbb84605";
+
+const welcomeDiv = document.getElementById("welcome-div")
 const tableDiv = document.getElementById("table-div");
 const resultDiv = document.getElementById("result-div");
 const errorDiv = document.getElementById("error-div");
-console.log(errorDiv)
+const homeLink = document.getElementById("home");
+console.log(homeLink);
 const body = document.body;
+
 const inputText = document.getElementById("input");
 const searchBtn = document.getElementById("search");
+
 const statistics = document.getElementById("statistics");
 const forecast = document.getElementById("hourly-forecast");
-
-console.log(inputText)
-console.log(searchBtn)
 
 function Weather(data) {
     this.city = data.city.name;
@@ -20,32 +23,45 @@ function Weather(data) {
     this.hourlyForecast = data.list
 }
 
+homeLink.addEventListener("click", () => {
+    displayNone(tableDiv, resultDiv, errorDiv)
+    welcomeDiv.style.display = "flex";
+
+})
+
 searchBtn.addEventListener("click", ev => {
 
     let newCity = inputText.value;
 
     getData(newCity).then(newWeather => {
-
         forecast.addEventListener("click", () => {
             removeChildren(tableDiv);
+            displayNone(welcomeDiv, resultDiv, errorDiv)
+            tableDiv.style.display = "flex";
             let h3 = document.createElement("h3");
+            console.log(newWeather.city);
             h3.textContent = `Weather forecast stats for every 3 hours in ${newWeather.city}`;
             tableDiv.appendChild(h3);
             createTable(newWeather.hourlyForecast);
         })
 
         statistics.addEventListener("click", e => {
+            removeChildren(resultDiv);
+            displayNone(welcomeDiv, tableDiv, errorDiv)
+            resultDiv.style.display = "flex"
             console.log("Stats");
         })
     })
+    inputText.value = "";
 })
+
+
 
 
 async function getData(input) {
     try {
-        const apiKey = "46947e8e71204bbdb2eb18c3cbb84605";
         const res = await fetch
-            (`https://api.openweathermap.org/data/2.5/forecast?q=${input}&units=metric&APPID=${apiKey}`);
+            (`https://api.openweathermap.org/data/2.5/forecast?q=${input}&units=metric&APPID=${API_KEY}`);
         const data = await res.json();
         console.log(data);
         const newWeather = new Weather(data);
@@ -54,8 +70,11 @@ async function getData(input) {
 
     } catch (error) {
         console.log("Something went wrong, please try again later", error);
+        // displayNone(welcomeDiv, tableDiv, resultDiv);
         const h1 = document.createElement("h1");
         h1.textContent = "CITY NOT FOUND. TRY AGAIN!";
+        h1.style.color = "white";
+        h1.style.textShadow = "0.1rem 0.1rem #31022c"
         errorDiv.appendChild(h1);
     }
 }
@@ -117,4 +136,10 @@ function removeChildren(element) {
     while (element.firstChild) {
         element.removeChild(element.firstChild);
     }
+}
+
+function displayNone(element1, element2, element3) {
+    element1.style.display = "none";
+    element2.style.display = "none";
+    element3.style.display = "none";
 }

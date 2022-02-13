@@ -11,7 +11,7 @@
 
 <body>
     <nav id='navbar'>
-        <div class="app-title">Weather Alert</div>
+        <div id="home" class="app-title">Weather Alert</div>
         <a href="#" class="toggle-btn">
             <span class="bar"></span>
             <span class="bar"></span>
@@ -21,22 +21,28 @@
             <ul>
                 <li><a href="#" id="statistics">Statistics</a></li>
                 <li><a href="#" id="hourly-forecast">Hourly Forecast</a></li>
-                <li><input type="text" id="input" placeholder="city"></li>
-                <li><input type="button" value="Search" id="search"></li>
-
             </ul>
         </div>
     </nav>
 
-    <main class="container">
-        <div id="result-div"></div>
-        <div id="table-div"></div>
-        <div id="error-div"></div>
-    </main>
+    <div class="container">
+        <div id="search-div">
+            <input type="text" id="input" placeholder="city">
+            <input type="button" value="Search" id="search">
+        </div>
 
-    <footer>
-        <h5>©2022 Zoran Karbev</h5>
-    </footer>
+        <main id="main">
+            <div id="welcome-div">
+                <h1>WEATHER ALERT</h1>
+                <h4>Keeping You Ahead of the Storm!</h4>
+            </div>
+            <div id="result-div"></div>
+            <div id="table-div"></div>
+            <div id="error-div"></div>
+        </main>
+
+        <footer>©2022 Zoran Karbev</footer>
+    </div>
 
     <script src="navbar.js"></script>
     <script src="app.js"></script>
