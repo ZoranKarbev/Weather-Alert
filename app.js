@@ -63,13 +63,19 @@ async function getData(input) {
         const res = await fetch
             (`https://api.openweathermap.org/data/2.5/forecast?q=${input}&units=metric&APPID=${API_KEY}`);
         const data = await res.json();
-        console.log(data);
+        // if (data.message === "Nothing to geocode"
+        //     || data.message === "city not found") {
+        //     return
+        // }
+
         const newWeather = new Weather(data);
         console.log(newWeather);
         return newWeather;
 
     } catch (error) {
         console.log("Something went wrong, please try again later", error);
+        console.log(error.message);
+
         // displayNone(welcomeDiv, tableDiv, resultDiv);
         const h1 = document.createElement("h1");
         h1.textContent = "CITY NOT FOUND. TRY AGAIN!";

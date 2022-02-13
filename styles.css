@@ -109,11 +109,6 @@ input:focus::placeholder {
 	cursor: pointer;
 }
 
-h3 {
-	margin-bottom: -8px;
-	color: white;
-}
-
 .toggle-btn {
 	position: absolute;
 	top: 1rem;
@@ -154,16 +149,15 @@ h3 {
 }
 
 #welcome-div h1 {
-	background-color: #31022c;
+	background-color: rgb(49, 2, 44, 0.8);
 	padding: 3px 50px 3px;
 	font-size: 9vw;
-	/* width: 80%; */
 }
 
 #welcome-div h4 {
 	font-size: 7.3vw;
 	text-shadow: 0.4rem 0.4rem #31022c;
-	/* width: 80%; */
+	width: 80%;
 }
 
 #search-div {
@@ -175,26 +169,13 @@ h3 {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	/* height: 100%; */
 }
 
 footer {
 	flex: 0;
-	/* position: absolute; */
-	/* margin-top: auto; */
-	/* position: fixed;*/
-	/* bottom: 0; */
 	margin: 10px auto;
 	color: white;
 	font-size: .8rem;
-}
-
-#table-div {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	text-align: center;
 }
 
 #result-div {
@@ -217,6 +198,13 @@ footer {
 #error-div h2 {
 	font-size: 5vw;
 }
+#table-div {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+}
 
 .sticky {
 	overflow-y: auto;
@@ -225,28 +213,36 @@ footer {
 	align-self: flex-start;
 }
 
+#table-div h3 {
+	color: white;
+	text-shadow: 0.1rem 0.1rem #31022c;
+	width: 98%;
+}
+
 th {
 	background-color: #64045b;
 	color: white;
 	padding: 1.2rem 0.1rem;
 }
 
-table,
 td {
-	/* border: 1px solid #31022c; */
-	/* padding: 5px; */
 	text-align: center;
 }
 
 table {
+	display: block;
+	width: 100%;
+	overflow-y: auto;
 	margin-top: 27px;
 	width: 95%;
-	height: 500px;
+	height: 450px;
 	table-layout: fixed;
 	border-radius: 5px;
 	box-shadow: 0 5px 10px #31022c;
 	border-collapse: collapse;
+	opacity: 0.85;
 }
+
 tr {
 	background-color: #edd5f1;
 }
@@ -296,5 +292,11 @@ tr:hover {
 	#welcome-div h4 {
 		font-size: 7.3vw;
 		text-shadow: 0.2rem 0.2rem #31022c;
+	}
+	#table-div h3 {
+		color: white;
+		text-shadow: 0.1rem 0.1rem #31022c;
+		width: 98%;
+		font-size: 1rem;
 	}
 }
