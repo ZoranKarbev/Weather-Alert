@@ -2,6 +2,7 @@ const welcomeDiv = document.getElementById("welcome-div");
 const tableDiv = document.getElementById("table-div");
 const resultDiv = document.getElementById("result-div");
 const errorDiv = document.getElementById("error-div");
+const currentDiv = document.getElementById("current-div")
 const homeLink = document.getElementById("home");
 const body = document.body;
 
@@ -112,8 +113,6 @@ function Weather(data) {
         }
         return formatString(coldestDay)
     }
-
-
 }
 
 function formatString(str) {
@@ -121,7 +120,7 @@ function formatString(str) {
 }
 
 homeLink.addEventListener("click", () => {
-    displayNone(tableDiv, resultDiv, errorDiv);
+    displayNone(tableDiv, resultDiv, errorDiv, currentDiv);
     welcomeDiv.style.display = "flex";
 })
 
@@ -134,7 +133,7 @@ searchBtn.addEventListener("click", ev => {
 
         forecast.addEventListener("click", () => {
             removeChildren(tableDiv);
-            displayNone(welcomeDiv, resultDiv, errorDiv)
+            displayNone(welcomeDiv, resultDiv, errorDiv, currentDiv)
             tableDiv.style.display = "flex";
             let h3 = document.createElement("h3");
             h3.textContent = `Weather forecast stats for every 3 hours in ${newWeather.city}`;
@@ -144,7 +143,7 @@ searchBtn.addEventListener("click", ev => {
 
         statistics.addEventListener("click", e => {
             removeChildren(resultDiv);
-            displayNone(welcomeDiv, tableDiv, errorDiv)
+            displayNone(welcomeDiv, tableDiv, errorDiv, currentDiv)
             resultDiv.style.display = "flex"
             console.log("Stats");
 
@@ -165,7 +164,7 @@ async function getData(input) {
         console.log(data)
 
         if (data.cod < 200 || data.cod > 299) {
-            displayNone(welcomeDiv, resultDiv, tableDiv);
+            displayNone(welcomeDiv, resultDiv, tableDiv, currentDiv);
             errorDiv.style.display = "flex";
             inputText.focus();
             return;
@@ -194,7 +193,7 @@ async function getData(input) {
         console.log(error);
 
         // removeChildren(errorDiv);
-        displayNone(welcomeDiv, resultDiv, tableDiv)
+        displayNone(welcomeDiv, resultDiv, tableDiv, currentDiv)
         errorDiv.style.display = "flex";
         // const h1 = document.createElement("h1");
         // h1.textContent = "CITY NOT FOUND. TRY AGAIN!";
@@ -261,8 +260,9 @@ function removeChildren(element) {
     }
 }
 
-function displayNone(element1, element2, element3) {
+function displayNone(element1, element2, element3, element4) {
     element1.style.display = "none";
     element2.style.display = "none";
     element3.style.display = "none";
+    element4.style.display = "none";
 }
