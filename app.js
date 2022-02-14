@@ -1,11 +1,8 @@
-const API_KEY = "46947e8e71204bbdb2eb18c3cbb84605";
-
-const welcomeDiv = document.getElementById("welcome-div")
+const welcomeDiv = document.getElementById("welcome-div");
 const tableDiv = document.getElementById("table-div");
 const resultDiv = document.getElementById("result-div");
 const errorDiv = document.getElementById("error-div");
 const homeLink = document.getElementById("home");
-console.log(homeLink);
 const body = document.body;
 
 const inputText = document.getElementById("input");
@@ -14,32 +11,132 @@ const searchBtn = document.getElementById("search");
 const statistics = document.getElementById("statistics");
 const forecast = document.getElementById("hourly-forecast");
 
+const API_KEY = "46947e8e71204bbdb2eb18c3cbb84605";
+
 function Weather(data) {
     this.city = data.city.name;
     this.country = data.city.country;
     this.currentTemp = Math.round(data.list[0].main.temp);
     this.currentHumidity = data.list[0].main.humidity;
     this.currentIcon = data.list[0].weather[0].icon;
-    this.hourlyForecast = data.list
+    this.hourlyForecast = data.list;
+
+    this.minHumidity = function () {
+        let humidities = this.hourlyForecast
+            .map(forecast => forecast.main.humidity);
+        let minHum = humidities[0];
+
+        humidities.forEach(humidity => {
+            if (minHum > humidity) {
+                minHum = humidity;
+            }
+        })
+        return minHum;
+    }
+
+    this.maxHumidity = function () {
+        let humidities = this.hourlyForecast
+            .map(forecast => forecast.main.humidity);
+        let maxHum = humidities[0];
+
+        humidities.forEach(humidity => {
+            if (maxHum < humidity) {
+                maxHum = humidity;
+            }
+        })
+        return maxHum;
+    }
+
+    this.averageHumidity = function () {
+        let humidities = this.hourlyForecast
+            .map(forecast => forecast.main.humidity)
+            .reduce((sum, humidity) => sum += humidity, 0);
+
+        return humidities / this.hourlyForecast.length;
+    }
+
+    this.minTemperature = function () {
+        let temperatures = this.hourlyForecast.map(forecast => forecast.main.temp);
+        let minTemp = temperatures[0];
+
+        temperatures.forEach(temperature => {
+            if (minTemp > temperature) {
+                minTemp = temperature;
+            }
+        })
+        return minTemp;
+    }
+
+    this.maxTemperature = function () {
+        let temperatures = this.hourlyForecast.map(forecast => forecast.main.temp);
+        let maxTemp = temperatures[0];
+
+        temperatures.forEach(temperature => {
+            if (maxTemp < temperature) {
+                maxTemp = temperature;
+            }
+        })
+        return maxTemp;
+    }
+
+    this.averageTemperature = function () {
+        let temperatures = this.hourlyForecast
+            .map(forecast => forecast.main.temp)
+            .reduce((sum, temperature) => sum += temperature, 0);
+
+        return temperatures / this.hourlyForecast.length;
+    }
+
+    this.warmestDay = function () {
+        let maxTemp = this.hourlyForecast[0].main.temp;
+        let warmestDay = this.hourlyForecast[0].dt_txt
+
+        for (let i = 0; i < this.hourlyForecast.length; i++) {
+            if (maxTemp < this.hourlyForecast[i].main.temp) {
+                maxTemp = this.hourlyForecast[i].main.temp;
+                warmestDay = this.hourlyForecast[i].dt_txt;
+            }
+        }
+        return formatString(warmestDay);
+    }
+
+    this.coldestDay = function () {
+        // let temperatures = this.hourlyForecast.map(forecast => forecast.main.temp)
+        let minTemp = this.hourlyForecast[0].main.temp;
+        let coldestDay = this.hourlyForecast[0].dt_txt;
+        for (let i = 0; i < this.hourlyForecast.length; i++) {
+            if (minTemp > this.hourlyForecast[i].main.temp) {
+                minTemp = this.hourlyForecast[i].main.temp;
+                coldestDay = this.hourlyForecast[i].dt_txt;
+            }
+        }
+        return formatString(coldestDay)
+    }
+
+
+}
+
+function formatString(str) {
+    return `${str.slice(8, 10)}.${str.slice(5, 7)}.${str.slice(0, 4)}, ${str.slice(-8, -3)}`
 }
 
 homeLink.addEventListener("click", () => {
-    displayNone(tableDiv, resultDiv, errorDiv)
+    displayNone(tableDiv, resultDiv, errorDiv);
     welcomeDiv.style.display = "flex";
-
 })
 
 searchBtn.addEventListener("click", ev => {
+    if (inputText.value === "") return;
 
     let newCity = inputText.value;
 
     getData(newCity).then(newWeather => {
+
         forecast.addEventListener("click", () => {
             removeChildren(tableDiv);
             displayNone(welcomeDiv, resultDiv, errorDiv)
             tableDiv.style.display = "flex";
             let h3 = document.createElement("h3");
-            console.log(newWeather.city);
             h3.textContent = `Weather forecast stats for every 3 hours in ${newWeather.city}`;
             tableDiv.appendChild(h3);
             createTable(newWeather.hourlyForecast);
@@ -50,19 +147,31 @@ searchBtn.addEventListener("click", ev => {
             displayNone(welcomeDiv, tableDiv, errorDiv)
             resultDiv.style.display = "flex"
             console.log("Stats");
+
+            // let coldest = newWeather.coldestDay()
+            // let temperature123 = newWeather.warmestDay()
         })
     })
     inputText.value = "";
 })
 
 
-
-
 async function getData(input) {
     try {
-        const res = await fetch
+        let res = await fetch
             (`https://api.openweathermap.org/data/2.5/forecast?q=${input}&units=metric&APPID=${API_KEY}`);
-        const data = await res.json();
+        // console.log(res)
+        let data = await res.json();
+        console.log(data)
+
+        if (data.cod < 200 || data.cod > 299) {
+            displayNone(welcomeDiv, resultDiv, tableDiv);
+            errorDiv.style.display = "flex";
+            inputText.focus();
+            return;
+        }
+        // if (data.message !== 0) return;
+
         // if (data.message === "Nothing to geocode"
         //     || data.message === "city not found") {
         //     return
@@ -70,18 +179,26 @@ async function getData(input) {
 
         const newWeather = new Weather(data);
         console.log(newWeather);
+
+        console.log(newWeather.coldestDay())
+        console.log(newWeather.warmestDay())
+        // console.log(newWeather.averageHumidity)
+        // let abcdeHumidity = newWeather.averageHumidity()
+        // console.log(abcdeHumidity)
+        // console.log(newWeather(coldestDay))
+
         return newWeather;
 
     } catch (error) {
         console.log("Something went wrong, please try again later", error);
-        console.log(error.message);
+        console.log(error);
 
-        // displayNone(welcomeDiv, tableDiv, resultDiv);
-        const h1 = document.createElement("h1");
-        h1.textContent = "CITY NOT FOUND. TRY AGAIN!";
-        h1.style.color = "white";
-        h1.style.textShadow = "0.1rem 0.1rem #31022c"
-        errorDiv.appendChild(h1);
+        // removeChildren(errorDiv);
+        displayNone(welcomeDiv, resultDiv, tableDiv)
+        errorDiv.style.display = "flex";
+        // const h1 = document.createElement("h1");
+        // h1.textContent = "CITY NOT FOUND. TRY AGAIN!";
+        // errorDiv.appendChild(h1);
     }
 }
 
