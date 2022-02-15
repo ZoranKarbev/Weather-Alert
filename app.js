@@ -9,15 +9,19 @@ const body = document.body;
 const inputText = document.getElementById("input");
 const searchBtn = document.getElementById("search");
 
+const current = document.getElementById("current");
 const statistics = document.getElementById("statistics");
 const forecast = document.getElementById("hourly-forecast");
 
 const API_KEY = "46947e8e71204bbdb2eb18c3cbb84605";
 
+
 function Weather(data) {
     this.city = data.city.name;
     this.country = data.city.country;
     this.currentTemp = Math.round(data.list[0].main.temp);
+    this.currentWind = data.list[0].wind.speed;
+    this.currentDescription = data.list[0].weather[0].description.toUpperCase();
     this.currentHumidity = data.list[0].main.humidity;
     this.currentIcon = data.list[0].weather[0].icon;
     this.hourlyForecast = data.list;
@@ -53,7 +57,7 @@ function Weather(data) {
             .map(forecast => forecast.main.humidity)
             .reduce((sum, humidity) => sum += humidity, 0);
 
-        return humidities / this.hourlyForecast.length;
+        return Math.round(humidities / this.hourlyForecast.length);
     }
 
     this.minTemperature = function () {
@@ -65,7 +69,7 @@ function Weather(data) {
                 minTemp = temperature;
             }
         })
-        return minTemp;
+        return Math.round(minTemp);
     }
 
     this.maxTemperature = function () {
@@ -77,7 +81,7 @@ function Weather(data) {
                 maxTemp = temperature;
             }
         })
-        return maxTemp;
+        return Math.round(maxTemp);
     }
 
     this.averageTemperature = function () {
@@ -85,7 +89,7 @@ function Weather(data) {
             .map(forecast => forecast.main.temp)
             .reduce((sum, temperature) => sum += temperature, 0);
 
-        return temperatures / this.hourlyForecast.length;
+        return Math.round(temperatures / this.hourlyForecast.length);
     }
 
     this.warmestDay = function () {
@@ -102,21 +106,21 @@ function Weather(data) {
     }
 
     this.coldestDay = function () {
-        // let temperatures = this.hourlyForecast.map(forecast => forecast.main.temp)
         let minTemp = this.hourlyForecast[0].main.temp;
         let coldestDay = this.hourlyForecast[0].dt_txt;
+
         for (let i = 0; i < this.hourlyForecast.length; i++) {
             if (minTemp > this.hourlyForecast[i].main.temp) {
                 minTemp = this.hourlyForecast[i].main.temp;
                 coldestDay = this.hourlyForecast[i].dt_txt;
             }
         }
-        return formatString(coldestDay)
+        return formatString(coldestDay);
     }
 }
 
 function formatString(str) {
-    return `${str.slice(8, 10)}.${str.slice(5, 7)}.${str.slice(0, 4)}, ${str.slice(-8, -3)}`
+    return `${str.slice(-8, -3)}h, ${str.slice(8, 10)}.${str.slice(5, 7)}.${str.slice(0, 4)}`
 }
 
 homeLink.addEventListener("click", () => {
@@ -125,32 +129,55 @@ homeLink.addEventListener("click", () => {
 })
 
 searchBtn.addEventListener("click", ev => {
-    if (inputText.value === "") return;
+    if (inputText.value === "") {
+        alert("Please enter the name of the city!")
+        return;
+    }
 
     let newCity = inputText.value;
 
     getData(newCity).then(newWeather => {
 
+        current.addEventListener('click', ev => {
+            if (currentDiv.hasChildNodes()) {
+                displayNone(welcomeDiv, resultDiv, errorDiv, tableDiv);
+                currentDiv.style.display = "flex";
+            } else return;
+        })
+
         forecast.addEventListener("click", () => {
             removeChildren(tableDiv);
-            displayNone(welcomeDiv, resultDiv, errorDiv, currentDiv)
+            displayNone(welcomeDiv, resultDiv, errorDiv, currentDiv);
             tableDiv.style.display = "flex";
             let h3 = document.createElement("h3");
-            h3.textContent = `Weather forecast stats for every 3 hours in ${newWeather.city}`;
+            h3.textContent = `${newWeather.city} weather forecast stats for the next five days.`;
             tableDiv.appendChild(h3);
             createTable(newWeather.hourlyForecast);
         })
 
         statistics.addEventListener("click", e => {
             removeChildren(resultDiv);
-            displayNone(welcomeDiv, tableDiv, errorDiv, currentDiv)
-            resultDiv.style.display = "flex"
+            displayNone(welcomeDiv, tableDiv, errorDiv, currentDiv);
+            resultDiv.style.display = "flex";
             console.log("Stats");
 
-            // let coldest = newWeather.coldestDay()
-            // let temperature123 = newWeather.warmestDay()
+            resultDiv.innerHTML = `
+            <div class="city-name">${newWeather.city}, ${newWeather.country}</div>
+            <div>weather in the next five days</div>
+            <br>
+            <div>MAX Temp: ${newWeather.maxTemperature()}°C</div>
+            <div>MIN Temp: ${newWeather.minTemperature()}°C</div>
+            <div>AVG Temp: ${newWeather.averageTemperature()}°C</div>
+            <br>
+            <div>MAX Humd: ${newWeather.maxHumidity()}%</div>
+            <div>MIN Humd: ${newWeather.minHumidity()}%</div>
+            <div>AVG Humd: ${newWeather.averageHumidity()}%</div>
+            <br>
+            <div>Warmest Time: ${newWeather.warmestDay()}</div>
+            <div>Coldest Time: ${newWeather.coldestDay()}</div>`
         })
-    })
+    });
+
     inputText.value = "";
 })
 
@@ -159,7 +186,6 @@ async function getData(input) {
     try {
         let res = await fetch
             (`https://api.openweathermap.org/data/2.5/forecast?q=${input}&units=metric&APPID=${API_KEY}`);
-        // console.log(res)
         let data = await res.json();
         console.log(data)
 
@@ -169,22 +195,19 @@ async function getData(input) {
             inputText.focus();
             return;
         }
-        // if (data.message !== 0) return;
-
-        // if (data.message === "Nothing to geocode"
-        //     || data.message === "city not found") {
-        //     return
-        // }
 
         const newWeather = new Weather(data);
         console.log(newWeather);
 
-        console.log(newWeather.coldestDay())
-        console.log(newWeather.warmestDay())
-        // console.log(newWeather.averageHumidity)
-        // let abcdeHumidity = newWeather.averageHumidity()
-        // console.log(abcdeHumidity)
-        // console.log(newWeather(coldestDay))
+        displayNone(welcomeDiv, resultDiv, errorDiv, tableDiv);
+        currentDiv.style.display = "flex";
+        current.focus();
+
+        currentDiv.innerHTML = `
+        <div class="city-name">${newWeather.city}, ${newWeather.country}</div>
+        <div id="temp">${newWeather.currentTemp}°c</div>
+        <div id="description">${newWeather.currentDescription}</div>
+        <div>WIND: ${newWeather.currentWind}m/s, HUMIDITY: ${newWeather.currentHumidity}%</div>`
 
         return newWeather;
 
@@ -192,12 +215,8 @@ async function getData(input) {
         console.log("Something went wrong, please try again later", error);
         console.log(error);
 
-        // removeChildren(errorDiv);
-        displayNone(welcomeDiv, resultDiv, tableDiv, currentDiv)
+        displayNone(welcomeDiv, resultDiv, tableDiv, currentDiv);
         errorDiv.style.display = "flex";
-        // const h1 = document.createElement("h1");
-        // h1.textContent = "CITY NOT FOUND. TRY AGAIN!";
-        // errorDiv.appendChild(h1);
     }
 }
 
