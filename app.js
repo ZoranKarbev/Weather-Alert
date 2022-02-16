@@ -206,6 +206,34 @@ async function getData(input) {
             errorDiv.style.display = "flex";
             inputText.focus();
 
+            statistics.addEventListener("click", ev => {
+                if (welcomeDiv.style.display === "flex") {
+                    return
+                }
+                displayNone(welcomeDiv, resultDiv, tableDiv, currentDiv);
+                errorDiv.style.display = "flex";
+                return;
+            })
+
+            forecast.addEventListener("click", ev => {
+                if (welcomeDiv.style.display === "flex") {
+                    return
+                }
+                displayNone(welcomeDiv, resultDiv, tableDiv, currentDiv);
+                errorDiv.style.display = "flex";
+                return;
+            })
+            current.addEventListener("click", ev => {
+                if (welcomeDiv.style.display === "flex") {
+                    return
+                }
+                displayNone(welcomeDiv, resultDiv, tableDiv, currentDiv);
+                errorDiv.style.display = "flex";
+                return;
+            })
+
+
+
             return;
         }
 
