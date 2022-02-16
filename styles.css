@@ -152,7 +152,7 @@ input:focus::placeholder {
 
 #welcome-1 {
 	background-color: rgb(49, 2, 44, 0.8);
-	padding: 3px 50px 3px;
+	padding: 3px .4em;
 	font-size: 9vw;
 	animation: slidein 1s;
 }

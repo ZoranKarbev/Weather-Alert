@@ -137,8 +137,22 @@ searchBtn.addEventListener("click", ev => {
     let newCity = inputText.value;
 
     getData(newCity).then(newWeather => {
+        if (!newWeather) return;
+
+        currentDiv.innerHTML = `
+        <div class="city-name">${newWeather.city}, ${newWeather.country}</div>
+        <div id="temp">${newWeather.currentTemp}°c</div>
+        <div id="description">${newWeather.currentDescription}</div>
+        <div>WIND: ${newWeather.currentWind}m/s, HUMIDITY: ${newWeather.currentHumidity}%</div>`
+
+        displayNone(welcomeDiv, resultDiv, errorDiv, tableDiv);
+        currentDiv.style.display = "flex";
+        current.focus();
+
 
         current.addEventListener('click', ev => {
+            // if (!newWeather) { return }
+
             if (currentDiv.hasChildNodes()) {
                 displayNone(welcomeDiv, resultDiv, errorDiv, tableDiv);
                 currentDiv.style.display = "flex";
@@ -159,7 +173,6 @@ searchBtn.addEventListener("click", ev => {
             removeChildren(resultDiv);
             displayNone(welcomeDiv, tableDiv, errorDiv, currentDiv);
             resultDiv.style.display = "flex";
-            console.log("Stats");
 
             resultDiv.innerHTML = `
             <div class="city-name">${newWeather.city}, ${newWeather.country}</div>
@@ -181,7 +194,6 @@ searchBtn.addEventListener("click", ev => {
     inputText.value = "";
 })
 
-
 async function getData(input) {
     try {
         let res = await fetch
@@ -193,21 +205,12 @@ async function getData(input) {
             displayNone(welcomeDiv, resultDiv, tableDiv, currentDiv);
             errorDiv.style.display = "flex";
             inputText.focus();
+
             return;
         }
 
         const newWeather = new Weather(data);
         console.log(newWeather);
-
-        displayNone(welcomeDiv, resultDiv, errorDiv, tableDiv);
-        currentDiv.style.display = "flex";
-        current.focus();
-
-        currentDiv.innerHTML = `
-        <div class="city-name">${newWeather.city}, ${newWeather.country}</div>
-        <div id="temp">${newWeather.currentTemp}°c</div>
-        <div id="description">${newWeather.currentDescription}</div>
-        <div>WIND: ${newWeather.currentWind}m/s, HUMIDITY: ${newWeather.currentHumidity}%</div>`
 
         return newWeather;
 
