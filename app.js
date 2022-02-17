@@ -3,18 +3,21 @@ const tableDiv = document.getElementById("table-div");
 const resultDiv = document.getElementById("result-div");
 const errorDiv = document.getElementById("error-div");
 const currentDiv = document.getElementById("current-div")
-const homeLink = document.getElementById("home");
 const body = document.body;
 
 const inputText = document.getElementById("input");
 const searchBtn = document.getElementById("search");
 
+const homeLink = document.getElementById("home");
 const current = document.getElementById("current");
 const statistics = document.getElementById("statistics");
 const forecast = document.getElementById("hourly-forecast");
 
-const API_KEY = "46947e8e71204bbdb2eb18c3cbb84605";
+const closeModalButton = document.querySelector(".modal-close-buttton");
+const overlay = document.getElementById("overlay");
+const modalDiv = document.getElementById("modal");
 
+const API_KEY = "46947e8e71204bbdb2eb18c3cbb84605";
 
 function Weather(data) {
     this.city = data.city.name;
@@ -126,11 +129,22 @@ function formatString(str) {
 homeLink.addEventListener("click", () => {
     displayNone(tableDiv, resultDiv, errorDiv, currentDiv);
     welcomeDiv.style.display = "flex";
+
 })
 
 searchBtn.addEventListener("click", ev => {
     if (inputText.value === "") {
-        alert("Please enter the name of the city!")
+        openModal(modalDiv)
+        closeModalButton.focus();
+
+        closeModalButton.addEventListener("click", ev => {
+            closeModal(modalDiv)
+            inputText.focus()
+        })
+
+        overlay.addEventListener("click", ev => {
+            closeModal(modalDiv)
+        })
         return;
     }
 
@@ -149,10 +163,7 @@ searchBtn.addEventListener("click", ev => {
         currentDiv.style.display = "flex";
         current.focus();
 
-
         current.addEventListener('click', ev => {
-            // if (!newWeather) { return }
-
             if (currentDiv.hasChildNodes()) {
                 displayNone(welcomeDiv, resultDiv, errorDiv, tableDiv);
                 currentDiv.style.display = "flex";
@@ -163,9 +174,11 @@ searchBtn.addEventListener("click", ev => {
             removeChildren(tableDiv);
             displayNone(welcomeDiv, resultDiv, errorDiv, currentDiv);
             tableDiv.style.display = "flex";
+
             let h3 = document.createElement("h3");
             h3.textContent = `${newWeather.city} weather forecast stats for the next five days.`;
             tableDiv.appendChild(h3);
+
             createTable(newWeather.hourlyForecast);
         })
 
@@ -199,7 +212,7 @@ async function getData(input) {
         let res = await fetch
             (`https://api.openweathermap.org/data/2.5/forecast?q=${input}&units=metric&APPID=${API_KEY}`);
         let data = await res.json();
-        console.log(data)
+        console.log(data);
 
         if (data.cod < 200 || data.cod > 299) {
             displayNone(welcomeDiv, resultDiv, tableDiv, currentDiv);
@@ -207,32 +220,21 @@ async function getData(input) {
             inputText.focus();
 
             statistics.addEventListener("click", ev => {
-                if (welcomeDiv.style.display === "flex") {
-                    return
-                }
                 displayNone(welcomeDiv, resultDiv, tableDiv, currentDiv);
                 errorDiv.style.display = "flex";
                 return;
             })
 
             forecast.addEventListener("click", ev => {
-                if (welcomeDiv.style.display === "flex") {
-                    return
-                }
                 displayNone(welcomeDiv, resultDiv, tableDiv, currentDiv);
                 errorDiv.style.display = "flex";
                 return;
             })
             current.addEventListener("click", ev => {
-                if (welcomeDiv.style.display === "flex") {
-                    return
-                }
                 displayNone(welcomeDiv, resultDiv, tableDiv, currentDiv);
                 errorDiv.style.display = "flex";
                 return;
             })
-
-
 
             return;
         }
@@ -243,7 +245,6 @@ async function getData(input) {
         return newWeather;
 
     } catch (error) {
-        console.log("Something went wrong, please try again later", error);
         console.log(error);
 
         displayNone(welcomeDiv, resultDiv, tableDiv, currentDiv);
@@ -253,7 +254,7 @@ async function getData(input) {
 
 function createTable(hourlyForecast) {
     let columnNames =
-        ['Icon', 'Description', 'Date and Time', 'Temperature (℃)', 'Humidity (%)', 'Wind Speed (m/s)'];
+        ['Icon', 'Description', 'Time and Date', 'Temperature (℃)', 'Humidity (%)', 'Wind Speed (m/s)'];
     let table = document.createElement('table');
     let thead = document.createElement('thead');
     let tbody = document.createElement('tbody');
@@ -279,7 +280,7 @@ function createTable(hourlyForecast) {
         let td2 = createTd(hour.weather[0].description);
         tableRow.appendChild(td2);
 
-        let td3 = createTd(hour.dt_txt);
+        let td3 = createTd(formatString(hour.dt_txt));
         tableRow.appendChild(td3);
 
         let td4 = createTd(Math.round(hour.main.temp));
@@ -315,4 +316,19 @@ function displayNone(element1, element2, element3, element4) {
     element2.style.display = "none";
     element3.style.display = "none";
     element4.style.display = "none";
+}
+
+function openModal(modal) {
+    if (modal == null) return;
+
+    modal.classList.add("active");
+    overlay.classList.add("active");
+}
+
+
+function closeModal(modal) {
+    if (modal == null) return;
+
+    modal.classList.remove("active");
+    overlay.classList.remove("active");
 }
